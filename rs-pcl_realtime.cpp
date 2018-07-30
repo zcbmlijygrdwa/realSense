@@ -66,6 +66,9 @@ pcl_ptr points_to_pcl(const rs2::points& points, const rs2::video_frame& color){
 
 	// Iterating through all points and setting XYZ coordinates
 	// and RGB values
+	
+
+	/*
 	for (int i = 0; i < points.size(); ++i)
 	{
 		cloud->points[i].x = vertices[i].x;
@@ -80,6 +83,24 @@ pcl_ptr points_to_pcl(const rs2::points& points, const rs2::video_frame& color){
 		cloud->points[i].g = std::get<1>(current_color);
 		cloud->points[i].b = std::get<0>(current_color);
 
+	}
+
+	*/
+	for (auto& p : cloud->points)
+	{
+		p.x = vertices->x;
+		p.y = vertices->y;
+		p.z = vertices->z;
+
+		std::tuple<uint8_t, uint8_t, uint8_t> current_color;
+		current_color = get_texcolor(color, *tex_coords);
+		
+		p.r = std::get<0>(current_color);
+		p.g = std::get<1>(current_color);
+		p.b = std::get<2>(current_color);
+
+		vertices++;
+		tex_coords++;
 	}
 
 	return cloud;
@@ -162,7 +183,7 @@ int main(int argc, char * argv[]) try
 		pcl::PassThrough<pcl::PointXYZRGB> pass;
 		pass.setInputCloud(pcl_points);
 		pass.setFilterFieldName("z");
-		pass.setFilterLimits(0.48, 1.6);
+		pass.setFilterLimits(0.48, 2);
 		pass.filter(*cloud_filtered);
 
 
